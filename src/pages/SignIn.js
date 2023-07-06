@@ -1,21 +1,36 @@
-import React from 'react';
-import {Link, useHistory} from 'react-router-dom';
-import {useAuth, useAuthUpdate} from "../components/AuthContext";
-
+import React, {useContext, useState} from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import axios from "axios";
 
 function SignIn() {
 
-  const history = useHistory();
-  const toggleAuth = useAuthUpdate()
-  const isAuth = useAuth()
+  const { login } = useContext(AuthContext)
 
-  function handleFormSubmit(e) {
+  const [user, setUser] = useState({
+    email: null,
+    password: null,
+  })
+
+  async function handleFormSubmit(e) {
 
     e.preventDefault()
-    console.log("User logged: " + isAuth)
 
-    if(isAuth) {
-      history.push('/profile')
+    try {
+      const result = await axios.post('http://localhost:3000/login', {
+        email: user.email,
+        password: user.password,
+      });
+      console.log(result.data)
+      login(
+        result.data.user.email,
+        result.data.user.username,
+        result.data.user.id,
+        result.data.accessToken
+      )
+
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -26,10 +41,32 @@ function SignIn() {
 
       <form onSubmit={(e) => handleFormSubmit(e)}>
         <label htmlFor="email"></label>
-        <input type="email" id="email" placeholder="email" />
+        <input
+          type="email"
+          id="email"
+          placeholder="email"
+          autoComplete="email"
+          onChange={(e) => {
+            setUser({
+              ...user,
+              email: e.target.value
+            })
+          }}
+        />
         <label htmlFor="password"></label>
-        <input type="email" id="password" placeholder="password" />
-        <button onClick={toggleAuth}>Inloggen</button>
+        <input
+          type="password"
+          id="password"
+          placeholder="password"
+          autoComplete="current-password"
+          onChange={(e) => {
+            setUser({
+              ...user,
+              password: e.target.value
+            })
+          }}
+        />
+        <button type="submit">Inloggen</button>
       </form>
 
       <p>Heb je nog geen account? <Link to="/signup">Registreer</Link> je dan eerst.</p>

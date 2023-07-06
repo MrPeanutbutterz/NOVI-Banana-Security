@@ -1,49 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import logo from '../assets/banana-01.png';
-import {useHistory, Link} from 'react-router-dom';
-import {useAuth, useAuthUpdate} from "./AuthContext";
+import {Link, useHistory} from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
-export default function NavBar() {
+function NavBar() {
 
+  const { isAuth, logout } = useContext(AuthContext);
   const history = useHistory();
-  const toggleAuth = useAuthUpdate()
-  const isAuth = useAuth()
 
-  console.log("User logged: " + isAuth)
-
-  if (useAuth()) {
-    return (
-      <nav>
-        <Link to="/">
+  return (
+    <nav>
+      <Link to="/">
           <span className="logo-container">
             <img src={logo} alt="logo"/>
             <h3>
               Banana Security
             </h3>
           </span>
-        </Link>
+      </Link>
 
-        <div>
-          <button
-            type="button"
-            onClick={toggleAuth}
-          >Log out
-          </button>
-        </div>
-      </nav>
-    );
-  } else {
-    return (
-      <nav>
-        <Link to="/">
-          <span className="logo-container">
-            <img src={logo} alt="logo"/>
-            <h3>
-              Banana Security
-            </h3>
-          </span>
-        </Link>
-
+      {isAuth ?
+        <button
+          type="button"
+          onClick={logout}
+        >
+          Log uit
+        </button>
+        :
         <div>
           <button
             type="button"
@@ -58,7 +41,9 @@ export default function NavBar() {
             Registreren
           </button>
         </div>
-      </nav>
-    );
-  }
+      }
+    </nav>
+  );
 }
+
+export default NavBar;
